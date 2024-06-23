@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WorldCities.Server.Models
 {
@@ -26,11 +28,13 @@ namespace WorldCities.Server.Models
         /// <summary>
         /// country code (in ISO 3166-1 ALPHA-2 format)
         /// </summary>
+        [JsonPropertyName("iso2")]
         public required string ISO2 { get; set; }
-        
+
         /// <summary>
         /// country code (int ISO 3166-1 ALPHA-3 format)
         /// </summary>
+        [JsonPropertyName("iso3")]
         public required string ISO3 { get; set; }
         #endregion
 

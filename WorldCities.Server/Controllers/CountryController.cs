@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
+using System.Runtime.CompilerServices;
+using WorldCities.Server.Data;
 using WorldCities.Server.Models;
 using WorldCities.Server.Services.Repository;
 
@@ -19,10 +21,11 @@ namespace WorldCities.Server.Controllers
 
         //GET api/Country
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
+        public async Task<ActionResult<ApiResult<Country>>> GetCountries(int pageIndex = 0, int pageSize = 10,
+            string? sortColumn = null, string? sortOrder = null, string? filterColumn = null, string? filterQuery = null)
         {
             var countries = await _repository.GetAll();
-            return Ok(countries);
+            return await ApiResult<Country>.CreateAsync(countries, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
         }
 
         [HttpGet("{id}")]

@@ -22,10 +22,10 @@ namespace WorldCities.Server.Controllers
         // GET: api/City
         [HttpGet]
         public async Task<ActionResult<ApiResult<City>>> GetCities(int pageIndex = 0,
-        int pageSize = 10)
+        int pageSize = 10, string? sortColumn = null, string? sortOrder = null, string? filterColumn = null, string? filterQuery = null)
         {
             var cities = await _repository.GetAll();
-            return await ApiResult<City>.CreateAsync(cities, pageIndex, pageSize);
+            return await ApiResult<City>.CreateAsync(cities, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
         }
 
         // GET: api/City/5
