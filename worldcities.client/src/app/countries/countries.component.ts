@@ -12,15 +12,25 @@ import { environment } from '../../environments/environment.development';
   styleUrls: ['./countries.component.scss']
 })
 export class CountriesComponent implements OnInit {
+
   public displayedColumns: string[] = ['id', 'name', 'iso2', 'iso3'];
+
   public countries!: MatTableDataSource<Country>;
+
   defaultPageIndex: number = 0;
+
   defaultPageSize: number = 10;
+
   public defaultSortColumn: string = "name";
+
   public defaultSortOrder: "asc" | "desc" = "asc";
+
   defaultFilterColumn: string = "name";
+
   filterQuery?: string;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   @ViewChild(MatSort) sort!: MatSort;
   constructor(private http: HttpClient) {
   }

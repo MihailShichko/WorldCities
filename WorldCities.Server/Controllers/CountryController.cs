@@ -19,6 +19,27 @@ namespace WorldCities.Server.Controllers
             _repository = (CoutriesRepository)repository;
         }
 
+        [HttpPost]
+        [Route("IsDupeField")]
+        public async Task<bool> IsDupField(int countryId, string fieldName, string fieldValue)
+        {
+            var counties = await _repository.GetAll();
+            switch (fieldName)
+            {
+                case "name":
+                    return counties.Any(
+                        c => c.Name == fieldValue && c.Id != countryId);
+                case "iso2":
+                    return counties.Any(
+                        c => c.ISO2 == fieldValue && c.Id != countryId);
+                case "iso3":
+                    return counties.Any(
+                        c => c.ISO3 == fieldValue && c.Id != countryId);
+            }
+            
+            return false;
+        }
+
         //GET api/Country
         [HttpGet]
         public async Task<ActionResult<ApiResult<Country>>> GetCountries(int pageIndex = 0, int pageSize = 10,
@@ -43,10 +64,10 @@ namespace WorldCities.Server.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> PutCountry(int id, Country country)
         {
-            if (id != country.Id)
-            {
-                return BadRequest();
-            }
+            //if (id != country.Id)
+            //{
+            //    return BadRequest();
+            //}
 
             if(!_repository.UpdateInstance(country))
             {

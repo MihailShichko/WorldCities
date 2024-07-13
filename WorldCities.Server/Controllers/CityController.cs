@@ -59,6 +59,18 @@ namespace WorldCities.Server.Controllers
             return NoContent();
         }
 
+
+        [HttpPost]
+        [Route("IsDupeCity")]
+        public async Task<bool> IsDupeCity(City city)
+        {
+            var cities = await _repository.GetAll();
+            return cities.Any(c => c.Name == city.Name 
+            && c.Lat == city.Lat
+            && c.Lon == city.Lon
+            && c.CountryId == city.CountryId
+            && c.Id != city.Id);
+        } 
         // POST: api/City
         [HttpPost]
         public async Task<ActionResult<City>> PostCity(City city)

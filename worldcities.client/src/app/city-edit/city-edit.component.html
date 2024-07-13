@@ -1,37 +1,70 @@
 <div class="city-edit">
   <h1>{{title}}</h1>
-  <p *ngIf="id && !city">Loading...</p>
-  <div [formGroup]="form" (ngSubmit)="onSubmit()">
+  <p *ngIf="id && !city"><em>Loading...</em></p>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <p>
+      <mat-error *ngIf="form.invalid && form.hasError('isDupeCity')">
+        <strong>ERROR</strong>:
+        A city with the same <i>name</i>, <i>lat</i>,
+        <i>lon</i> and <i>country</i> already exists.
+      </mat-error>
+    </p>
+
+    <!—Name -->
     <mat-form-field>
       <mat-label>Name:</mat-label>
       <input matInput formControlName="name" required
-             placeholder="Type a name">      
+             placeholder="Type a name">
+      <mat-error *ngIf="form.controls['name'].errors?.['required']">
+        Name is required.
+      </mat-error>
     </mat-form-field>
+
+    <!-- Lat -->
     <mat-form-field>
       <mat-label>Latitude:</mat-label>
       <input matInput formControlName="lat" required
-             placeholder="Type a latitude">
+             placeholder="Insert latitude">
+      <mat-error *ngIf="form.controls['lat'].errors?.['required']">
+        Latitude is required.
+      </mat-error>
     </mat-form-field>
+
+    <!-- Lon -->
     <mat-form-field>
-      <mat-label>Longtitude</mat-label>
-      <input MatInput formControlName="lon" required
-             placeholder="Type a longtitude">
+      <mat-label>Longitude:</mat-label>
+      <input matInput formControlName="lon" required
+             placeholder="Insert longitude">
+      <mat-error *ngIf="form.controls['lon'].errors?.['required']">
+        Longitude is required.
+      </mat-error>
     </mat-form-field>
-    <p *nfIf="countries">
-      <select id="countryId" formControlName="countryId">
-        <option value=""> Select a country</option>
-        <option *ngFor="let country of countries" [value]="countryId">{{country.name}}</option>
-      </select>
-    </p>
+
+    <!-- Country -->
+    <mat-form-field *ngIf="countries">
+      <mat-label>Select a Country...</mat-label>
+      <mat-select id="countryId" formControlName="countryId">
+        <mat-option *ngFor="let country of countries"
+                    [value]="country.id">
+          {{country.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.controls['countryId'].errors?.['required']">
+        Please select a Country.
+      </mat-error>
+    </mat-form-field>
+
     <div>
       <button mat-flat-button color="primary"
-              type="submit" (click)="onSubmit()">
-        {{this.id ? "Save" : "Create"}}
+              type="submit"
+              [disabled]="!form.valid">
+        {{ id ? "Save" : "Create" }}
       </button>
-      <button mat-flat-button color="primary"
+      <button mat-flat-button color="secondary"
               [routerLink]="['/cities']">
         Cancel
       </button>
     </div>
-  </div>
+  </form>
 </div>
