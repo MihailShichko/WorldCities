@@ -29,7 +29,7 @@ namespace WorldCities.Server.Services.Repository
 
         public async Task<IEnumerable<City>> GetAll()
         {
-            return await _context.Cities.ToListAsync();
+            return await _context.Cities.Include(c => c.Country).ToListAsync();
         }
 
         public async Task<City> GetByIdAsync(int id)

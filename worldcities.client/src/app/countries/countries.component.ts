@@ -5,6 +5,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { environment } from '../../environments/environment.development';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-countries',
@@ -13,9 +16,11 @@ import { environment } from '../../environments/environment.development';
 })
 export class CountriesComponent implements OnInit {
 
-  public displayedColumns: string[] = ['id', 'name', 'iso2', 'iso3'];
+  public displayedColumns: string[] = ['id', 'name', 'iso2', 'iso3', 'cityAmount'];
 
   public countries!: MatTableDataSource<Country>;
+
+  filterTextChanged: Subject<string> = new Subject<string>();
 
   defaultPageIndex: number = 0;
 
@@ -37,6 +42,18 @@ export class CountriesComponent implements OnInit {
   ngOnInit() {
     this.loadData();
   }
+
+  onFilterTextChanged(filterText: string) {
+    if (!this.filterTextChanged.observed) {
+      this.filterTextChanged.pipe(debounceTime(1000), distinctUntilChanged())
+        .subscribe(query => {
+          this.loadData(query);
+        });
+    }
+
+    this.filterTextChanged.next(filterText);
+  }
+
   loadData(query?: string) {
     var pageEvent = new PageEvent();
     pageEvent.pageIndex = this.defaultPageIndex;

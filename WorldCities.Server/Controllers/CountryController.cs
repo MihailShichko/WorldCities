@@ -5,6 +5,7 @@ using NuGet.Protocol.Core.Types;
 using System.Runtime.CompilerServices;
 using WorldCities.Server.Data;
 using WorldCities.Server.Models;
+using WorldCities.Server.Models.DTO;
 using WorldCities.Server.Services.Repository;
 
 namespace WorldCities.Server.Controllers
@@ -42,11 +43,19 @@ namespace WorldCities.Server.Controllers
 
         //GET api/Country
         [HttpGet]
-        public async Task<ActionResult<ApiResult<Country>>> GetCountries(int pageIndex = 0, int pageSize = 10,
+        public async Task<ActionResult<ApiResult<CountryDTO>>> GetCountries(int pageIndex = 0, int pageSize = 10,
             string? sortColumn = null, string? sortOrder = null, string? filterColumn = null, string? filterQuery = null)
         {
             var countries = await _repository.GetAll();
-            return await ApiResult<Country>.CreateAsync(countries, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
+            var dto = countries.Select(c => new CountryDTO()//hmm
+            {
+                Id = c.Id,
+                Name = c.Name,
+                ISO2 = c.ISO2,
+                ISO3 = c.ISO3,
+                CityAmount = c.Cities != null ? c.Cities.Count : 0
+            }).ToList();
+            return await ApiResult<CountryDTO>.CreateAsync(dto, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
         }
 
         [HttpGet("{id}")]

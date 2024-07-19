@@ -7,32 +7,40 @@ import { environment } from '../../environments/environment.development';
 import { Country } from '../countries/country'
 import { count, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { BaseFormComponent } from '../base-form.component';
+import { CityService } from '../cities/city.servise';
+
 
 @Component({
   selector: 'app-city-edit',
   templateUrl: './city-edit.component.html',
   styleUrls: ['./city-edit.component.scss']
 })
-export class CityEditComponent implements OnInit{
+export class CityEditComponent extends BaseFormComponent implements OnInit{
   //the view title
   title?: string;
-
-  form!: FormGroup;
 
   city?: City;
 
   id?: number; //NULL when adding new one
 
   countries?: Country[];
-  constructor(private activatedRoute: ActivatedRoute, private router: Router, private http: HttpClient) {
-
+  constructor(private activatedRoute: ActivatedRoute, private router: Router, private http: HttpClient,
+    private cityService: CityService) {
+    super();
   }
 
   ngOnInit(): void {
     this.form = new FormGroup({
       name: new FormControl('', Validators.required),
-      lat: new FormControl('', Validators.required),
-      lon: new FormControl('', Validators.required),
+      lat: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[-]?[0-9]+(\.[0-9]{1,4})?$/)
+      ]),
+      lon: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[-]?[0-9]+(\.[0-9]{1,4})?$/)
+      ]),
       countryId: new FormControl('', Validators.required)
     }, null, this.isDupeCity());
 
@@ -48,8 +56,8 @@ export class CityEditComponent implements OnInit{
       city.lon = +this.form.controls['lon'].value;
       city.countryId = +this.form.controls['countryId'].value;
 
-      var url = environment.baseUrl + 'api/City/IsDupeCity'; 
-      return this.http.post<boolean>(url, city).pipe(map(result => { 
+      var url = environment.baseUrl + 'api/City/IsDupeCity';
+      return this.cityService.isDupeCity(city).pipe(map(result => { 
 
         return (result ? { isDupeCity: true } : null);
       }));
@@ -57,15 +65,12 @@ export class CityEditComponent implements OnInit{
   }
 
   loadData() {
-    console.log("before load counties")
     this.loadCountries();
-    console.log("countries loaded")
     var idParams = this.activatedRoute.snapshot.paramMap.get('id');
     this.id = idParams ? +idParams : 0;
     if (this.id)//EDIT MODE
     {
-      var url = environment.baseUrl + "api/City/" + this.id;
-      this.http.get<City>(url).subscribe({
+      this.cityService.get(this.id).subscribe({
         next: (result) => {
           this.city = result;
           this.title = "Edit - " + this.city.name;
@@ -83,12 +88,12 @@ export class CityEditComponent implements OnInit{
   }
 
   loadCountries() {
-    var url = environment.baseUrl + "api/Country/"
-    var params = new HttpParams()
-      .set("pageIndex", 0)
-      .set("pageSize", "9999")
-      .set("sortColumn", "name");
-    this.http.get<any>(url, { params }).subscribe({
+    this.cityService.getCountries(0,
+      9999,
+      "name",
+      "asc",
+      null,
+      null).subscribe({
       next: (result) => {
         this.countries = result.data;
       },
@@ -110,29 +115,11 @@ export class CityEditComponent implements OnInit{
       city.countryId = +this.form.controls["countryId"].value;
       if (this.id) //edit
       {
-        var url = environment.baseUrl + "api/City/" + city.id;
-        this.http.put<City>(url, city).subscribe({
-          next: (result) => {
-            console.log("City " + city!.id + "has been updated");
-            this.router.navigate(['/cities']);
-          },
-          error: (error) => {
-            console.error(error);
-          }
-        })
+        this.cityService.put(city);
       }
       else //add
       {
-        var url = environment.baseUrl + "api/City";
-        this.http.post<City>(url, city).subscribe({
-          next: (result) => {
-            console.log("City" + result.id + "has been created");
-            this.router.navigate(['/cities']);
-          },
-          error: (error) => {
-            console.error(error);
-          }
-        })
+        this.cityService.post(city);
       }
 
       

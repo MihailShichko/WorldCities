@@ -6,11 +6,8 @@
       <mat-label>Name:</mat-label>
       <input matInput formControlName="name" required
              placeholder="Type a name">
-      <mat-error *ngIf="form.controls['name'].errors?.['required']">
-        Name is required.
-      </mat-error>
-      <mat-error *ngIf="form.controls['name'].errors?.['isDupeFailed']">
-        Country already exists.
+      <mat-error *ngFor="let error of getErrors(form.get('name')!, 'name')">
+        {{error}}
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -19,14 +16,8 @@
       </mat-label>
       <input matInput formControlName="iso2" required
              placeholder="Type iso2" />
-      <mat-error *ngIf="form.controls['iso2'].errors?.['required']">
-        ISO2.
-      </mat-error>
-      <mat-error *ngIf="form.controls['iso2'].errors?.['pattern']">
-        Requires ISO2
-      </mat-error>
-      <mat-error *ngIf="form.controls['iso2'].errors?.['isDupeField']">
-        Already exists
+      <mat-error *ngFor="let error of getErrors(form.get('iso2')!, 'iso2')">
+        {{error}}
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -35,14 +26,8 @@
       </mat-label>
       <input matInput formControlName="iso3" required
              placeholder="Type iso3" />
-      <mat-error *ngIf="form.controls['iso3'].errors?.['required']">
-        ISO3.
-      </mat-error>
-      <mat-error *ngIf="form.controls['iso3'].errors?.['pattern']">
-        Requires ISO3
-      </mat-error>
-      <mat-error *ngIf="form.controls['iso3'].errors?.['isDupeField']">
-        Already exists
+      <mat-error *ngFor="let error of getErrors(form.get('iso3')!, 'iso3')">
+        {{error}}
       </mat-error>
     </mat-form-field>
     <div>
