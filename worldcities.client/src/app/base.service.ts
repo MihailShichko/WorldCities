@@ -30,6 +30,7 @@ export interface ApiResult<T> {
   data: T[];
   pageIndex: number;
   pageSize: number;
+  totalCount: number;
   sortOrder: string;
   sortFilter: string;
   filterColumn: string | null;
