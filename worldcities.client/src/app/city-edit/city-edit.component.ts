@@ -89,7 +89,7 @@ export class CityEditComponent extends BaseFormComponent implements OnInit{
 
   loadCountries() {
     this.cityService.getCountries(0,
-      9999,
+      999,
       "name",
       "asc",
       null,
@@ -115,11 +115,26 @@ export class CityEditComponent extends BaseFormComponent implements OnInit{
       city.countryId = +this.form.controls["countryId"].value;
       if (this.id) //edit
       {
-        this.cityService.put(city);
+        this.cityService.put(city).subscribe({
+          next: (result) => {
+            console.log("City " + city!.id + " has been updated.");
+
+            this.router.navigate(['/cities']);
+          },
+          error: (error) => console.error(error)
+        });
       }
       else //add
       {
-        this.cityService.post(city);
+        this.cityService.post(city).subscribe({
+          next: (result) => {
+
+            console.log("City " + result.id + " has been created.");
+
+            this.router.navigate(['/cities']);
+          },
+          error: (error) => console.error(error)
+        });
       }
 
       

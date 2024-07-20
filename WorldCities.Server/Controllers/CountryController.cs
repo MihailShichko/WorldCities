@@ -22,7 +22,7 @@ namespace WorldCities.Server.Controllers
 
         [HttpPost]
         [Route("IsDupeField")]
-        public async Task<bool> IsDupField(int countryId, string fieldName, string fieldValue)
+        public async Task<bool> IsDupeField(int countryId, string fieldName, string fieldValue)
         {
             var counties = await _repository.GetAll();
             switch (fieldName)

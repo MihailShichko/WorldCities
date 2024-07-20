@@ -84,10 +84,13 @@ export class CitiesComponent implements OnInit {
       filterColumn,
       filterQuery).subscribe({
         next: (result) => {
-
+          this.paginator.length = result.totalCount;
+          this.paginator.pageIndex = result.pageIndex;
+          this.paginator.pageSize = result.pageSize;
+          this.cities = new MatTableDataSource<City>(result.data);
         },
         error: (error) => {
-
+          console.error(error)
         }
       })
    

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResult, BaseService } from '../base.service';
-import { Country } from './country';
+import { Country, CountryBack } from './country';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -25,7 +25,11 @@ export class CountryService extends BaseService<Country> {
   }
   override put(item: Country): Observable<Country> {
     var url = this.getUrl("api/Country/" + item.id);
-    return this.http.put<Country>(url, item);
+    //var a = <CountryBack>{};
+    //a.id = item.id;
+    //a.iso2 = item.iso2;
+    //a.iso3 = item.iso3;
+    return this.http.put<CountryBack>(url, item);
   }
   override post(item: Country): Observable<Country> {
     var url = this.getUrl("api/Country");
@@ -40,9 +44,9 @@ export class CountryService extends BaseService<Country> {
     var url = this.getUrl("api/Country/IsDupeField")
     var params = new HttpParams()
       .set("countryId", countryId)
-      .set("filedName", fieldName)
+      .set("fieldName", fieldName)
       .set("fieldValue", fieldValue);
-    return this.http.post<boolean>(url, { params });
+    return this.http.post<boolean>(url, null, { params });
   }
 
   constructor(http: HttpClient) {

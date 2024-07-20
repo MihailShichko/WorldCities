@@ -54,7 +54,7 @@ export class CityService extends BaseService<City>{
     var params = new HttpParams()
       .set("pageIndex", pageIndex.toString())
       .set("pageSize", pageSize.toString())
-      .set("sortColumn", pageSize)
+      .set("sortColumn", sortColumn)
       .set("sortOrder", sortOrder)      
 
     if (filterColumn && filterQuery) {
