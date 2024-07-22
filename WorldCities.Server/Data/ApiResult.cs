@@ -115,7 +115,10 @@ namespace WorldCities.Server.Data
             queryableSource = queryableSource
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize);
-                
+#if DEBUG
+
+            //var sql = source.ToParametrizedSql();
+#endif
             var data = queryableSource.ToList();
             return new ApiResult<T>(
             data,

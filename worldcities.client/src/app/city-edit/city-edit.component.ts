@@ -5,8 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment.development';
 import { Country } from '../countries/country'
-import { count, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { count, Observable, Subscription } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 import { BaseFormComponent } from '../base-form.component';
 import { CityService } from '../cities/city.servise';
 
@@ -23,6 +23,8 @@ export class CityEditComponent extends BaseFormComponent implements OnInit{
   city?: City;
 
   id?: number; //NULL when adding new one
+
+  private subscriptions: Subscription = new Subscription();
 
   countries?: Country[];
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private http: HttpClient,
@@ -43,6 +45,15 @@ export class CityEditComponent extends BaseFormComponent implements OnInit{
       ]),
       countryId: new FormControl('', Validators.required)
     }, null, this.isDupeCity());
+
+    this.subscriptions.add(this.form.valueChanges.subscribe(() => {
+      if (!this.form.dirty) {
+        this.log("Form Model has been loaded");
+      }
+      else {
+        this.log("Form has been updated");
+      }
+    }));
 
     this.loadData();
   }
@@ -136,8 +147,16 @@ export class CityEditComponent extends BaseFormComponent implements OnInit{
           error: (error) => console.error(error)
         });
       }
-
-      
     }
+  }
+
+  log(str: string) {
+    console.log("["
+      + new Date().toLocaleString()
+      + "] " + str);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 }

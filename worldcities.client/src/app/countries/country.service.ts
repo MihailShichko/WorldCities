@@ -29,7 +29,7 @@ export class CountryService extends BaseService<Country> {
     //a.id = item.id;
     //a.iso2 = item.iso2;
     //a.iso3 = item.iso3;
-    return this.http.put<CountryBack>(url, item);
+    return this.http.put<Country>(url, item);
   }
   override post(item: Country): Observable<Country> {
     var url = this.getUrl("api/Country");
