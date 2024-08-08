@@ -4,15 +4,15 @@
 
 <p *ngIf="!cities"><em>LOADING...</em></p>
 
+<button mat-flat-button color="primary"
+        class="btn-add" *ngIf="cities && _authService.isAuthentificated()" [routerLink]="['/city']">
+    Add new City
+</button>
+
 <mat-form-field [hidden]="!cities">
   <input matInput #filter (keyup)="onFilterTextChanged(filter.value)"
          placeholder="Filter by name (or part of it)..."/>
 </mat-form-field>
-
-<button mat-flat-button color="primary"
-        class="btn-add" *ngIf="cities" [routerLink]="['/city']" >
-  Add new City
-</button>
 
 <table mat-table [dataSource]="cities"
        class="mat-elevation-z8"

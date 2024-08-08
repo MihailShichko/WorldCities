@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
@@ -71,6 +72,7 @@ namespace WorldCities.Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "RegistratedUser")]
         public async Task<ActionResult> PutCountry(int id, Country country)
         {
             //if (id != country.Id)
@@ -87,6 +89,7 @@ namespace WorldCities.Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteCountry(int id)
         {
             if (!_repository.DeleteInstance(id))
@@ -98,6 +101,7 @@ namespace WorldCities.Server.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "RegistratedUser")]
         public async Task<ActionResult> PostCountry(Country country)
         {
             if (!_repository.AddInstance(country))

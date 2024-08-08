@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
@@ -9,16 +11,26 @@ using WorldCities.Server.Models;
 namespace WorldCities.Server.Controllers
 {
     [Route("api/[controller]/[action]")]
+    [Authorize(Roles = "Administrator")]
     [ApiController]
     public class SeedController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
 
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        private readonly IConfiguration _confviguration;
+
         private IWebHostEnvironment _env;
-        public SeedController(ApplicationDbContext dbContext, IWebHostEnvironment env)
+        public SeedController(ApplicationDbContext dbContext, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration confviguration)
         {
-            _dbContext = dbContext;
-            _env = env;
+            this._dbContext = dbContext;
+            this._env = env;
+            this._roleManager = roleManager;
+            this._confviguration = confviguration;
+            this._userManager = userManager;
         }
 
         [HttpGet]
@@ -112,6 +124,75 @@ namespace WorldCities.Server.Controllers
             {
                 Cities = numberOfCitiesAdded,
                 Countries = numberOfCountriesAdded
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateDefaultUsers()
+        {
+            var role_RegistratedUser = "RegistratedUser";
+            var role_Admin = "Admin";
+
+            if(await _roleManager.FindByNameAsync(role_RegistratedUser) == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(role_RegistratedUser));
+            }
+
+            if(await _roleManager.FindByNameAsync(role_Admin) == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(role_Admin));
+            }
+
+            var addedUserList = new List<ApplicationUser>();
+
+            var email_admin = "admin@email.com";
+            if(await _userManager.FindByNameAsync(email_admin) == null)
+            {
+                var userAdmin = new ApplicationUser()
+                {
+                    Email = email_admin,
+                    UserName = email_admin,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+
+                await _userManager.CreateAsync(userAdmin, _confviguration["DefaultPasswords:Administrator"]);
+
+                await _userManager.AddToRoleAsync(userAdmin, role_Admin);
+                await _userManager.AddToRoleAsync(userAdmin, role_RegistratedUser);
+
+                userAdmin.EmailConfirmed = true;
+                userAdmin.LockoutEnabled = false;
+
+                addedUserList.Add(userAdmin);
+            }
+
+            var email_User = "user@email.com";
+
+            if (await _userManager.FindByNameAsync(email_User) == null)
+            {
+                var User = new ApplicationUser()
+                {
+                    Email = email_User,
+                    UserName = email_User,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+
+                await _userManager.CreateAsync(User, _confviguration["DefaultPasswords:RegisteredUser"]);
+
+                await _userManager.AddToRoleAsync(User, role_RegistratedUser);
+
+                User.EmailConfirmed = true;
+                User.LockoutEnabled = false;
+
+                addedUserList.Add(User);
+            }
+
+            if (addedUserList.Count > 0)
+                await _dbContext.SaveChangesAsync();
+            return new JsonResult(new
+            {
+                Count = addedUserList.Count,
+                Users = addedUserList
             });
         }
     }

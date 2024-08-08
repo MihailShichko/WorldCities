@@ -5,15 +5,19 @@ import { CitiesComponent } from "../cities/cities.component"
 import { CountriesComponent } from '../countries/countries.component';
 import { CityEditComponent } from '../city-edit/city-edit.component';
 import { CountryEditComponent } from '../countries/country-edit.component'
+import { LoginComponent } from '../auth/login.component';
+import { AuthGuard } from '../auth/auth.guard';
+
 
 const routes: Routes =
   [{ path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'cities', component: CitiesComponent },
-  { path: 'countries', component: CountriesComponent },
-  { path: 'city/:id', component: CityEditComponent },
-  { path: 'city', component: CityEditComponent },
-  { path: 'country', component: CountryEditComponent },
-  { path: 'country/:id', component: CountryEditComponent }];
+        { path: 'countries', component: CountriesComponent },
+        { path: 'city/:id', component: CityEditComponent, canActivate: [AuthGuard] },
+        { path: 'city', component: CityEditComponent, canActivate: [AuthGuard] },
+        { path: 'country', component: CountryEditComponent, canActivate: [AuthGuard] },
+        { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthGuard] },
+    { path: 'login', component: LoginComponent }];
 
 
 @NgModule({

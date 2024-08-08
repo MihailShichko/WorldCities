@@ -8,6 +8,7 @@ import { MatSort } from '@angular/material/sort';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CityService } from './city.servise';
+import { AuthService } from '../auth/auth-service.service';
 
 
 @Component({
@@ -23,6 +24,8 @@ export class CitiesComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+    _authService: AuthService;
+
   filterTextChanged: Subject<string> = new Subject<string>();
 
   defaultPageIndex:number = 0;
@@ -36,8 +39,8 @@ export class CitiesComponent implements OnInit {
   public defaultSortColumn: string = "name";
   public defaultSortOrder: "asc" | "desc" = "asc";
 
-  constructor(private cityService: CityService) {
-
+    constructor(private cityService: CityService, authService: AuthService) {
+        this._authService = authService;
   }
 
   ngOnInit() {

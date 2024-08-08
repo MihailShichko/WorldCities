@@ -25,10 +25,6 @@ export class CountryService extends BaseService<Country> {
   }
   override put(item: Country): Observable<Country> {
     var url = this.getUrl("api/Country/" + item.id);
-    //var a = <CountryBack>{};
-    //a.id = item.id;
-    //a.iso2 = item.iso2;
-    //a.iso3 = item.iso3;
     return this.http.put<Country>(url, item);
   }
   override post(item: Country): Observable<Country> {

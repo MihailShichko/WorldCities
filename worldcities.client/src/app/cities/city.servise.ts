@@ -34,9 +34,11 @@ export class CityService extends BaseService<City>{
     return this.http.get<ApiResult<City>>(url, { params });
   }
 
-  override put(item: City): Observable<City> {
-    var url = this.getUrl("api/City/" + item.id);
-    return this.http.put<City>(url, item);
+    override put(item: City): Observable<City> {
+        console.log("put");
+        var url = this.getUrl("api/City/" + item.id);
+        console.log(url);
+        return this.http.put<City>(url, item);
   }
 
   override post(item: City): Observable<City> {

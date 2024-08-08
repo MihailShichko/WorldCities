@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
@@ -52,7 +53,10 @@ namespace WorldCities.Server.Controllers
         }
 
         // PUT: api/City/5
+        
+        
         [HttpPut("{id}")]
+        [Authorize(Roles = "RegistratedUser")]
         public async Task<ActionResult> PutCity(int id, City city)
         {
             if (id != city.Id)
@@ -82,6 +86,7 @@ namespace WorldCities.Server.Controllers
         } 
         // POST: api/City
         [HttpPost]
+        [Authorize(Roles = "RegistratedUser")]
         public async Task<ActionResult<City>> PostCity(City city)
         {
             if (!_repository.AddInstance(city))
@@ -94,6 +99,7 @@ namespace WorldCities.Server.Controllers
 
         // DELETE: api/City/5
         [HttpDelete("{id}")]
+        //[Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteCity(int id)
         {
             if (!_repository.DeleteInstance(id))
