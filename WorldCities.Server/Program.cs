@@ -10,6 +10,7 @@ using Serilog.Sinks.MSSqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using WorldCities.Server.Data.GraphQL;
 
 
 namespace WorldCities.Server
@@ -38,16 +39,45 @@ namespace WorldCities.Server
                     .WriteTo.Console();
             });
 
+            builder.Services.AddCors(options =>
+            options.AddPolicy(name: "AngularPolicy",
+                cfg => {
+                    cfg.AllowAnyHeader();
+                    cfg.AllowAnyMethod();
+                    cfg.WithOrigins(builder.Configuration["AllowedCORS"]!);
+                }));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<JwtHandler>();
+           
             builder.Services.AddScoped<IRepository<City>, CitiesRepository>();
             builder.Services.AddScoped<IRepository<Country>, CoutriesRepository>();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 8;
+            })
+            .AddApiEndpoints()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddScoped<JwtHandler>();
+
+            builder.Services.AddGraphQLServer() //AddAuthorization can't be found (WHY???????????????)
+                .AddAuthorizationCore()
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>()
+                .AddFiltering()
+                .AddSorting();
 
             builder.Services.AddAuthentication(opt =>
             {
@@ -64,22 +94,10 @@ namespace WorldCities.Server
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.
-                        GetBytes(builder.Configuration["JwtSettings:SecurityKey"]!))
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecurityKey"]!))
                 };
             }).AddBearerToken(IdentityConstants.BearerScheme);
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = true;
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequiredLength = 8;
-            })
-                .AddApiEndpoints()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             var app = builder.Build();
 
@@ -101,8 +119,11 @@ namespace WorldCities.Server
 
             app.MapControllers();
 
-            app.MapFallbackToFile("/index.html");
+            app.MapGraphQL("/api/graphql");
 
+            app.MapFallbackToFile("/index.html");
+            app.MapMethods("/api/heartbeat", new[] { "HEAD" },
+                () => Results.Ok());
             app.Run();
         }
     }

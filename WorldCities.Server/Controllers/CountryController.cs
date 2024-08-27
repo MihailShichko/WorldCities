@@ -25,7 +25,7 @@ namespace WorldCities.Server.Controllers
         [Route("IsDupeField")]
         public async Task<bool> IsDupeField(int countryId, string fieldName, string fieldValue)
         {
-            var counties = await _repository.GetAll();
+            var counties = _repository.GetAll();
             switch (fieldName)
             {
                 case "name":
@@ -47,7 +47,7 @@ namespace WorldCities.Server.Controllers
         public async Task<ActionResult<ApiResult<CountryDTO>>> GetCountries(int pageIndex = 0, int pageSize = 10,
             string? sortColumn = null, string? sortOrder = null, string? filterColumn = null, string? filterQuery = null)
         {
-            var countries = await _repository.GetAll();
+            var countries = _repository.GetAll();
             var dto = countries.Select(c => new CountryDTO()//hmm
             {
                 Id = c.Id,

@@ -7,6 +7,8 @@ using OfficeOpenXml;
 using System.Security;
 using WorldCities.Server.Data;
 using WorldCities.Server.Models;
+using System.IO;
+
 
 namespace WorldCities.Server.Controllers
 {
@@ -41,7 +43,7 @@ namespace WorldCities.Server.Controllers
                 throw new SecurityException("Not allowed");
             }
 
-            var path = Path.Combine(_env.ContentRootPath, "Source/worldcities.xlsx");
+            var path = System.IO.Path.Combine(_env.ContentRootPath, "Source/worldcities.xlsx");
             using var stream = System.IO.File.OpenRead(path);
             using var excelPackage = new ExcelPackage(stream);
 

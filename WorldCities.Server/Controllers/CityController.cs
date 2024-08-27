@@ -26,7 +26,7 @@ namespace WorldCities.Server.Controllers
         public async Task<ActionResult<ApiResult<CityDTO>>> GetCities(int pageIndex = 0,
         int pageSize = 10, string? sortColumn = null, string? sortOrder = null, string? filterColumn = null, string? filterQuery = null)
         {
-            var cities = await _repository.GetAll();
+            var cities = _repository.GetAll();
             return await ApiResult<CityDTO>.CreateAsync(cities.Select(c => new CityDTO()
             {
                 Id = c.Id,
@@ -77,7 +77,7 @@ namespace WorldCities.Server.Controllers
         [Route("IsDupeCity")]
         public async Task<bool> IsDupeCity(City city)
         {
-            var cities = await _repository.GetAll();
+            var cities = _repository.GetAll();
             return cities.Any(c => c.Name == city.Name 
             && c.Lat == city.Lat
             && c.Lon == city.Lon

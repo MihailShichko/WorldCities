@@ -27,9 +27,9 @@ namespace WorldCities.Server.Services.Repository
 
         }
 
-        public async Task<IEnumerable<City>> GetAll()
+        public IQueryable<City> GetAll()
         {
-            return await _context.Cities.Include(c => c.Country).ToListAsync();
+            return _context.Cities.Include(c => c.Country);
         }
 
         public async Task<City> GetByIdAsync(int id)

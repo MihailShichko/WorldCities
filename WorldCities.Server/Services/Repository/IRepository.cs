@@ -6,7 +6,7 @@
         /// Fetch all T instances from database
         /// </summary>
         /// <returns>T IEnumerable</returns>
-        public Task<IEnumerable<T>> GetAll();
+        public IQueryable<T> GetAll();
         /// <summary>
         /// Fetch T instance by id
         /// </summary>
